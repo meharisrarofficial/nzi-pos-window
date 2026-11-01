@@ -1,0 +1,34 @@
+name: Build EXE
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install
+      - name: Prepare web files and bundle libraries
+        shell: bash
+        run: |
+          mkdir -p www/libs/fa/css www/libs/fa/webfonts
+          cp index.html www/index.html
+          curl -fL -o www/libs/supabase.js https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js
+          curl -fL -o www/libs/qrcode.min.js https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js
+          curl -fL -o www/libs/FileSaver.min.js https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js
+          curl -fL -o www/libs/html2canvas.min.js https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js
+          curl -fL -o www/libs/fa/css/all.min.css https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css
+          for f in fa-solid-900 fa-regular-400 fa-brands-400; do
+            curl -fL -o www/libs/fa/webfonts/$f.woff2 https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/$f.woff2
+          done
+          node patch-html.js
+      - name: Build installer
+        run: npx electron-builder --win nsis --x64 --publish never
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NZI-POS-EXE
+          path: dist/*.exe
