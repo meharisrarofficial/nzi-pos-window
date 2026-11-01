@@ -1,0 +1,25 @@
+{
+  "name": "nzi-pos",
+  "productName": "NZI POS",
+  "version": "1.0.0",
+  "description": "NZI Enterprises POS",
+  "author": "NZI Enterprises",
+  "main": "main.js",
+  "private": true,
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.nzi.pos",
+    "productName": "NZI POS",
+    "files": ["main.js", "preload.js", "www/**/*"],
+    "directories": { "output": "dist" },
+    "win": { "target": "nsis" },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "artifactName": "NZI-POS-Setup.${ext}"
+    }
+  }
+}
